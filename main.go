@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 
@@ -12,11 +11,7 @@ import (
 
 func main() {
 	http.HandleFunc("/move", move)
-	err := http.ListenAndServe(":8080", nil)
-
-	if err != nil {
-		log.Fatal("ListenAndServe: ", err)
-	}
+	panic(http.ListenAndServe(":8080", nil))
 }
 
 func move(w http.ResponseWriter, r *http.Request) {
@@ -28,7 +23,12 @@ func move(w http.ResponseWriter, r *http.Request) {
 	}
 
 	pgn := keys[0]
-	fen := decode(pgn)
+	fen, err := decode(pgn)
+
+	if err != nil {
+		fmt.Fprintf(w, err.Error())
+		return
+	}
 
 	eng, err := uci.NewEngine("/home/ivzb/Downloads/stockfish-9-linux/Linux/stockfish-9-64")
 
@@ -42,11 +42,14 @@ func move(w http.ResponseWriter, r *http.Request) {
 		Hash:    128,
 		Ponder:  false,
 		OwnBook: true,
-		MultiPV: 4,
+		MultiPV: 1,
 	})
 
-	// set the starting position
-	eng.SetFEN(fen)
+	// set the position
+	if err := eng.SetFEN(fen); err != nil {
+		fmt.Fprintf(w, err.Error())
+		return
+	}
 
 	// set some result filter options
 	resultOpts := uci.HighestDepthOnly | uci.IncludeUpperbounds | uci.IncludeLowerbounds
@@ -57,16 +60,15 @@ func move(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// print it (String() goes to pretty JSON for now)
 	fmt.Fprintf(w, results.String())
 }
 
-func decode(moves string) string {
+func decode(moves string) (string, error) {
 	ps := pgn.NewPGNScanner(strings.NewReader(moves))
 	game, err := ps.Scan()
 
 	if err != nil {
-		log.Fatal(err)
+		return "", err
 	}
 
 	b := pgn.NewBoard()
@@ -74,9 +76,12 @@ func decode(moves string) string {
 	var fen string
 
 	for _, move := range game.Moves {
-		b.MakeMove(move)
+		if err := b.MakeMove(move); err != nil {
+			return "", err
+		}
+
 		fen = b.String()
 	}
 
-	return fen
+	return fen, nil
 }
