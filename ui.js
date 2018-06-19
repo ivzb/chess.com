@@ -1,23 +1,4 @@
 (function() {
-    function init() {
-        initBoard();
-        initController();
-        state.subscribe(updateUi);
-        stop();
-        white();
-
-        setInterval(function() {
-            if (isPlaying()) {
-                var newPgn = pgn();
-
-                if (state.pgn != newPgn) {
-                    state.pgn = newPgn;
-                    ask(newPgn);
-                }
-            }
-        }, 250);
-    }
-
     function initBoard() {
         var from = document.getElementById('from');
         var to = document.getElementById('to'); 
@@ -72,14 +53,27 @@
             'border: 1px solid #000; ' +
             'margin: 0 auto; ';
         wizzard.innerHTML = 
-            '<button id="btnWhite" onclick="white">white</button>' +
-            '<button id="btnBlack" onclick="black">black</button>' +
+            '<button id="btnWhite">white</button>' +
+            '<button id="btnBlack">black</button>' +
             '<br />' +
-            '<button id="btnPlay" onclick="play">play</button>' +
-            '<button id="btnStop" onclick="stop">stop</button>' +
+            '<button id="btnPlay">play</button>' +
+            '<button id="btnStop">stop</button>' +
             '<p id="nextMove"></p>';
 
         document.body.insertBefore(wizzard, document.body.childNodes[0]);
+
+        addClickListener('btnWhite', black);
+        addClickListener('btnBlack', white);
+        addClickListener('btnPlay', play);
+        addClickListener('btnStop', stop);
+    }
+
+    function addClickListener(id, callback) {
+        var element = document.getElementById(id);
+
+        if (element != undefined) {
+            element.addEventListener('click', callback);
+        }
     }
 
     function remove(node) {
@@ -177,7 +171,7 @@
 
     function calculate(move, isWhite, width) {
         var xOffset = (isWhite ? 'a' : 'h').charCodeAt();
-        var yOffset = (isWhite ? '1' : '8').charCodeAt();
+        var yOffset = (!isWhite ? '1' : '8').charCodeAt();
 
         var fromX = Math.abs(move.charCodeAt(0) - xOffset) * width;
         var fromY = Math.abs(move.charCodeAt(1) - yOffset) * width;
@@ -240,6 +234,25 @@
 
     function isWhite() {
         return state.is(state.flags.white);
+    }
+
+    function init() {
+        initBoard();
+        initController();
+        state.subscribe(updateUi);
+        black();
+        play();
+
+        setInterval(function() {
+            if (isPlaying()) {
+                var newPgn = pgn();
+
+                if (state.pgn != newPgn) {
+                    state.pgn = newPgn;
+                    ask(newPgn);
+                }
+            }
+        }, 250);
     }
 
     init();
