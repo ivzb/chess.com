@@ -49,15 +49,16 @@
         wizzard.id = 'wizzard';
         wizzard.style = 
             'display: inline-block; ' +
-            'background: #fff; ' +
-            'border: 1px solid #000; ' +
-            'margin: 0 auto; ';
+            'background: rgb(209, 228, 239); ' +
+            'border: 1px solid rgb(66, 133, 244); ' +
+            'margin: 0 auto; ' +
+            'position: absolute; ';
         wizzard.innerHTML = 
-            '<button id="btnWhite">white</button>' +
-            '<button id="btnBlack">black</button>' +
+            '<button id="btnWhite" style="padding: 5px; margin: 5px;">white</button>' +
+            '<button id="btnBlack" style="padding: 5px; margin: 5px;">black</button>' +
             '<br />' +
-            '<button id="btnPlay">play</button>' +
-            '<button id="btnStop">stop</button>' +
+            '<button id="btnPlay" style="padding: 5px; margin: 5px;">play</button>' +
+            '<button id="btnStop" style="padding: 5px; margin: 5px;">stop</button>' +
             '<p id="nextMove"></p>';
 
         document.body.insertBefore(wizzard, document.body.childNodes[0]);
