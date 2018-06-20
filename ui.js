@@ -51,8 +51,7 @@
             'display: inline-block; ' +
             'background: rgb(209, 228, 239); ' +
             'border: 1px solid rgb(66, 133, 244); ' +
-            'margin: 0 auto; ' +
-            'position: absolute; ';
+            'margin: 0 auto; ';
         wizzard.innerHTML = 
             '<button id="btnWhite" style="padding: 5px; margin: 5px;">white</button>' +
             '<button id="btnBlack" style="padding: 5px; margin: 5px;">black</button>' +
